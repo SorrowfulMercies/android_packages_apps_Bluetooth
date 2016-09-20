@@ -545,7 +545,6 @@ public class AdapterService extends Service {
         }
 
         debugLog("cleanup() - Bluetooth process exited normally.");
-        System.exit(0);
     }
 
     private static final int MESSAGE_PROFILE_SERVICE_STATE_CHANGED = 1;
@@ -2168,7 +2167,7 @@ public class AdapterService extends Service {
     private native boolean initNative();
     private native void cleanupNative();
     /*package*/ native void ssrcleanupNative(boolean cleanup);
-    /*package*/ native boolean enableNative();
+    /*package*/ native boolean enableNative(boolean startRestricted);
     /*package*/ native boolean disableNative();
     /*package*/ native boolean setAdapterPropertyNative(int type, byte[] val);
     /*package*/ native boolean getAdapterPropertiesNative();
