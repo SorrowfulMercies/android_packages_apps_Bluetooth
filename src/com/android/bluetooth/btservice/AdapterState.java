@@ -20,6 +20,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Message;
+import android.os.UserManager;
 import android.util.Log;
 
 import com.android.internal.util.State;
@@ -120,7 +121,6 @@ final class AdapterState extends StateMachine {
         @Override
         public boolean processMessage(Message msg) {
             AdapterService adapterService = mAdapterService;
-            AdapterProperties adapterProperties = mAdapterProperties;
             if (adapterService == null) {
                 Log.e(TAG,"receive message at OffState after cleanup:" +
                           msg.what);
@@ -133,7 +133,6 @@ final class AdapterState extends StateMachine {
                    mPendingCommandState.setTurningOn(true);
                    transitionTo(mPendingCommandState);
                    sendMessageDelayed(START_TIMEOUT, START_TIMEOUT_DELAY);
-                   adapterProperties.onBluetoothEnable();
                    adapterService.processStart();
                    break;
                case USER_TURN_OFF:
@@ -260,9 +259,9 @@ final class AdapterState extends StateMachine {
                     removeMessages(START_TIMEOUT);
 
                     //Enable
-                    boolean ret = adapterService.enableNative();
-                    if (!ret) {
-                        Log.e(TAG, "Error while turning Bluetooth On");
+                    boolean isGuest = UserManager.get(mAdapterService).isGuestUser();
+                    if (!adapterService.enableNative(isGuest)) {
+                        Log.e(TAG, "Error while turning Bluetooth on");
                         notifyAdapterStateChange(BluetoothAdapter.STATE_OFF);
                         transitionTo(mOffState);
                     } else {
